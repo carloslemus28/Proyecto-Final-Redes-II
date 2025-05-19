@@ -1,0 +1,78 @@
+const express = require('express');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const db = require('./db'); // Importamos la conexión a MySQL
+  
+require('dotenv').config();
+
+const router = express.Router();
+
+// Registro de usuario
+router.post('/register', async (req, res) => {
+    const { nombre, apellido, correo, contrasena } = req.body;
+
+    if (!nombre || !apellido || !correo || !contrasena) {
+        return res.status(400).json({ mensaje: 'Todos los campos son obligatorios' });
+    }
+
+    try {
+        // Verificar si el usuario ya existe
+        const [usuarioExistente] = await db.promise().query(
+            'SELECT * FROM usuarios WHERE correo = ?', [correo]
+        );
+        
+        if (usuarioExistente.length > 0) {
+            return res.status(400).json({ mensaje: 'El correo ya está registrado' });
+        }
+
+        // Encriptar la contraseña
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(contrasena, salt);
+
+        // Insertar usuario en la base de datos
+        await db.promise().query(
+            'INSERT INTO usuarios (nombre, apellido, correo, contrasena) VALUES (?, ?, ?, ?)',
+            [nombre, apellido, correo, hashedPassword]
+        );
+
+        res.status(201).json({ mensaje: 'Usuario registrado correctamente' });
+    } catch (error) {
+        res.status(500).json({ mensaje: 'Error en el servidor', error });
+    }
+});
+
+// Inicio de sesión
+router.post('/login', async (req, res) => {
+    const { correo, contrasena } = req.body;
+
+    if (!correo || !contrasena) {
+        return res.status(400).json({ mensaje: 'Todos los campos son obligatorios' });
+    }
+
+    try {
+        // Buscar usuario en la base de datos
+        const [usuario] = await db.promise().query(
+            'SELECT * FROM usuarios WHERE correo = ?', [correo]
+        );
+
+        if (usuario.length === 0) {
+            return res.status(400).json({ mensaje: 'Correo o contraseña incorrectos' });
+        }
+
+        // Verificar la contraseña
+        const validPassword = await bcrypt.compare(contrasena, usuario[0].contrasena);
+        if (!validPassword) {
+            return res.status(400).json({ mensaje: 'Correo o contraseña incorrectos' });
+        }
+
+        // Generar token JWT
+        const token = jwt.sign({ id: usuario[0].id, correo: usuario[0].correo }, process.env.JWT_SECRET, {
+            expiresIn: '1h'
+        });
+        res.status(200).json({ mensaje: 'Inicio de sesión exitoso', token, usuario: usuario[0] });
+    } catch (error) {
+        res.status(500).json({ mensaje: 'Error en el servidor', error });
+    }
+});
+
+module.exports = router;

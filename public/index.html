@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ruleta Casino Web</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Pantalla de bienvenida -->
+  <section id="pantalla-inicio" class="pantalla">
+    <h1 class="titulo-principal">BIENVENIDO AL JUEGO DE LA RULETA</h1>
+    <button onclick="mostrarLogin()">Iniciar</button>
+  </section>
+
+  <!-- Login -->
+  <section id="pantalla-login" class="pantalla oculto">
+    <h2>Iniciar Sesión</h2>
+    <input type="email" id="login-correo" placeholder="Correo">
+    <div style="position: relative;">
+      <input type="password" id="login-pass" placeholder="Contraseña">
+      <i class="fa-solid fa-eye"
+      onclick="togglePassword('login-pass', this)"
+      style="position:absolute; right:10px; top:50%; transform:translateY(-50%);
+             cursor:pointer; color:#333; font-size:18px;"></i>
+    </div>
+    <button onclick="iniciarSesion()">Entrar</button>
+    <p>¿No tienes cuenta? <a href="#" onclick="mostrarRegistro()">Regístrate</a></p>
+  </section>
+ <!-- Registro -->
+  <section id="pantalla-registro" class="pantalla oculto">
+    <h2>Registro</h2>
+    <input type="text" id="reg-nombre" placeholder="Nombre">
+    <input type="text" id="reg-apellido" placeholder="Apellido">
+    <input type="email" id="reg-correo" placeholder="Correo">
+    <div style="position: relative;">
+      <input type="password" id="reg-pass" placeholder="Contraseña">
+      <i class="fa-solid fa-eye"
+      onclick="togglePassword('reg-pass', this)"
+      style="position:absolute; right:10px; top:50%; transform:translateY(-50%);
+             cursor:pointer; color:#333; font-size:18px;"></i>
+    </div>
+       
+    <button onclick="registrarUsuario()">Registrarse</button>
+    <p>¿Ya tienes cuenta? <a href="#" onclick="mostrarLogin()">Inicia sesión</a></p>
+  </section>
+
+  <!-- Pantalla del juego -->
+  <section id="pantalla-juego" class="pantalla oculto">
+    <div id="dashboard">
+      <div class="info-jugador">
+        <i class="fa-solid fa-user"></i> <strong>Jugador:</strong> <span id="nombre-usuario"></span>
+      </div>
+      <div class="info-coins">
+        <i class="fa-solid fa-coins"></i> <strong>COINS:</strong> <span id="coins-usuario">0</span>
+      </div>
+      <div class="botones-dashboard">
+        <button onclick="cerrarSesion()"><i class="fa-solid fa-right-from-bracket"></i> Cerrar sesión</button>
+        <button onclick="mostrarHistorial()"><i class="fa-solid fa-scroll"></i> Ver Historial</button>
+        <button onclick="mostrarRanking()"><i class="fa-solid fa-trophy"></i> Ver Ranking</button>
+      </div>
+    </div>
+    
+
+    <div id="ruleta-container">
+        <canvas id="ruletaCanvas" width="400" height="400"></canvas>
+        <button onclick="apostar()">🎯 Girar Ruleta</button>
+    </div>    
+
+    <div id="opciones-apuesta">
+      <select id="tipo-apuesta">
+        <option value="color">Color</option>
+        <option value="numero">Número</option>
+      </select>
+      <input type="text" id="valor-apostado" placeholder="rojo / 7">
+      <input type="number" id="monto-apostado" placeholder="Monto (COINS)">
+    </div>
+
+    <div id="resultado-jugada"></div>
+  </section>
+
+  <!-- Ranking -->
+  <section id="pantalla-ranking" class="pantalla oculto">
+    <h2>🏆 Ranking de Jugadores</h2>
+    <table id="tabla-ranking">
+      <thead>
+        <tr><th>#</th><th>Nombre</th><th>COINS</th></tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+    <button onclick="volverAlJuego()">Volver al juego</button>
+  </section>
+<!-- Modal de Historial -->
+<div id="modal-historial" class="modal oculto">
+  <div class="modal-contenido">
+    <span class="cerrar-modal" onclick="cerrarModalHistorial()">&times;</span>
+    <h2>📜 Historial de Apuestas</h2>
+    <table id="tabla-historial">
+      <thead>
+        <tr>
+          <th>Tipo</th>
+          <th>Valor</th>
+          <th>Monto</th>
+          <th>Resultado</th>
+          <th>Ganancia</th>
+          <th>Número</th>
+          <th>Color</th>
+          <th>Fecha</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</div>
+
+  
+  <script src="app.js"></script>
+</body>
+</html>
