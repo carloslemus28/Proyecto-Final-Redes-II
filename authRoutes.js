@@ -73,5 +73,20 @@ router.post('/login', async (req, res) => {
         res.status(500).json({ mensaje: 'Error en el servidor', error });
     }
 });
+//Restablecer contra
+router.post('/restablecer', async (req, res) => {
+  const { correo, nuevaContrasena } = req.body;
+
+  const user = await prisma.usuario.findUnique({ where: { correo } });
+  if (!user) return res.status(404).json({ mensaje: "Correo no registrado" });
+
+  const hash = await bcrypt.hash(nuevaContrasena, 10);
+  await prisma.usuario.update({
+    where: { correo },
+    data: { contrasena: hash }
+  });
+
+  res.json({ mensaje: "Contraseña actualizada exitosamente" });
+});
 
 module.exports = router;
