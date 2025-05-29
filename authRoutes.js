@@ -1,7 +1,7 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const db = require('./db'); // Importamos la conexión a MySQL
+const db = require('./db');
   
 require('dotenv').config();
 
@@ -16,7 +16,7 @@ router.post('/register', async (req, res) => {
     }
 
     try {
-        // Verificar si el usuario ya existe
+        // Verificar si el usuario existe
         const [usuarioExistente] = await db.promise().query(
             'SELECT * FROM usuarios WHERE correo = ?', [correo]
         );
@@ -25,7 +25,7 @@ router.post('/register', async (req, res) => {
             return res.status(400).json({ mensaje: 'El correo ya está registrado' });
         }
 
-        // Encriptar la contraseña
+        // Encriptar la contra
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(contrasena, salt);
 
@@ -41,7 +41,7 @@ router.post('/register', async (req, res) => {
     }
 });
 
-// Inicio de sesión
+// Inicio de sesion
 router.post('/login', async (req, res) => {
     const { correo, contrasena } = req.body;
 
@@ -59,13 +59,12 @@ router.post('/login', async (req, res) => {
             return res.status(400).json({ mensaje: 'Correo o contraseña incorrectos' });
         }
 
-        // Verificar la contraseña
+        // Verificar la contra
         const validPassword = await bcrypt.compare(contrasena, usuario[0].contrasena);
         if (!validPassword) {
             return res.status(400).json({ mensaje: 'Correo o contraseña incorrectos' });
         }
-
-        // Generar token JWT
+        // Generar token
         const token = jwt.sign({ id: usuario[0].id, correo: usuario[0].correo }, process.env.JWT_SECRET, {
             expiresIn: '1h'
         });
