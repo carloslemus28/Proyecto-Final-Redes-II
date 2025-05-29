@@ -1,19 +1,19 @@
-// Esperar a que cargue el DOM
 document.addEventListener('DOMContentLoaded', () => {
-    // Secciones (coinciden con IDs del HTML)
+    // SECCIONES DE PANTALLAS
     const inicio = document.getElementById('pantalla-inicio');
     const login = document.getElementById('pantalla-login');
     const registro = document.getElementById('pantalla-registro');
     const juego = document.getElementById('pantalla-juego');
     const ranking = document.getElementById('pantalla-ranking');
+    const restablecer = document.getElementById('pantalla-restablecer');
 
-    // Mostrar una sola pantalla
+    // MOSTRAR TODO EN UNA PANTALLA
     function mostrar(seccion) {
-        [inicio, login, registro, juego, ranking].forEach(s => s.classList.add('oculto'));
+        [inicio, login, registro, juego, ranking, restablecer].forEach(s => s.classList.add('oculto'));
         seccion.classList.remove('oculto');
     }
 
-    // Funciones de navegación globales para usar con "onclick" en el HTML
+    // FUNCIONES DE NAVEGACION
     window.mostrarLogin = () => {
         document.getElementById('login-correo').value = '';
         document.getElementById('login-pass').value = '';
@@ -27,17 +27,24 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('reg-pass').value = '';
         mostrar(document.getElementById('pantalla-registro'));
     };
+   
+ // MOSTRAR RESTABLECER CONTRA
+    window.mostrarRestablecer = () => {
+        document.getElementById('correo-restablecer').value = '';
+        document.getElementById('nueva-pass').value = '';
+        mostrar(document.getElementById('pantalla-restablecer'));
+    };
     
     window.cerrarSesion = () => mostrar(inicio);
     //MOSTRAR RANKING DE JUGADORES
     window.mostrarRanking = async () => {
         const tablaBody = document.querySelector('#tabla-ranking tbody');
-        tablaBody.innerHTML = ''; // Limpiar ranking anterior
+        tablaBody.innerHTML = '';
     
         try {
             const token = localStorage.getItem('token');
     
-            const respuesta = await fetch('http://localhost:3000/api/game/ranking', {
+            const respuesta = await fetch('http://165.73.244.26:3000/api/game/ranking', {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
@@ -60,7 +67,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.getElementById('pantalla-ranking').classList.remove('oculto');
             } else {
                 manejarErrorTokenExpirado(datos);
-                alert('❌ No se pudo obtener el ranking');
+                alert('No se pudo obtener el ranking');
             }
         } catch (error) {
             console.error(error);
@@ -74,7 +81,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
         try {
             const token = localStorage.getItem('token');
-            const respuesta = await fetch(`http://localhost:3000/api/game/historial/${window.usuarioActual.id}`, {
+            const respuesta = await fetch(`http://165.73.244.26:3000/api/game/historial/${window.usuarioActual.id}`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
@@ -101,7 +108,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.getElementById('modal-historial').style.display = 'block';
             } else {
                 manejarErrorTokenExpirado(datos);
-                alert('❌ No se pudo obtener el historial');
+                alert('No se pudo obtener el historial');
             }
         } catch (error) {
             console.error(error);
@@ -115,7 +122,6 @@ document.addEventListener('DOMContentLoaded', () => {
     
     window.volverAlJuego = () => mostrar(juego);
 
-    // Mostrar inicio al cargar
     mostrar(inicio);
     dibujarRuleta();
 });
@@ -127,16 +133,16 @@ window.registrarUsuario = async () => {
     // Validar formato básico del correo
     const regexCorreo = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!regexCorreo.test(correo)) {
-        alert('❌ Ingresa un correo electrónico válido.');
+        alert('Ingresa un correo electrónico válido.');
         return;
     }
 
-    // Verificar dominio mal escrito común
+    // Verificar correo
     const dominiosInvalidos = ['gamil.com', 'hotmial.com', 'yaho.com', 'gmai.com'];
     const dominioUsuario = correo.split('@')[1];
 
     if (dominiosInvalidos.includes(dominioUsuario)) {
-        alert('❌ Ingresa un correo electrónico válido.');
+        alert('Ingresa un correo electrónico válido.');
         return;
     }
 
@@ -148,7 +154,7 @@ window.registrarUsuario = async () => {
     }
 
     try {
-        const respuesta = await fetch('http://localhost:3000/api/auth/register', {
+        const respuesta = await fetch('http://165.73.244.26:3000/api/auth/register', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -159,10 +165,10 @@ window.registrarUsuario = async () => {
         const datos = await respuesta.json();
 
         if (respuesta.ok) {
-            alert('✅ Registro exitoso, ahora inicia sesión');
-            mostrarLogin(); // Te lleva automáticamente al login
+            alert('Registro exitoso, ahora inicia sesión');
+            mostrarLogin();
         } else {
-            alert(`❌ Error: ${datos.mensaje}`);
+            alert(`Error: ${datos.mensaje}`);
         }
     } catch (error) {
         alert('Error al conectar con el servidor');
@@ -180,7 +186,7 @@ window.iniciarSesion = async () => {
     }
 
     try {
-        const respuesta = await fetch('http://localhost:3000/api/auth/login', {
+        const respuesta = await fetch('http://165.73.244.26:3000/api/auth/login', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ correo, contrasena })
@@ -189,11 +195,11 @@ window.iniciarSesion = async () => {
         const datos = await respuesta.json();
 
         if (respuesta.ok) {
-            alert('✅ Inicio de sesión exitoso');
+            alert('Inicio de sesión exitoso');
 
             // Guardar datos del jugador
             const usuario = datos.usuario;
-            window.usuarioActual = usuario; // Guardamos globalmente el usuario logueado
+            window.usuarioActual = usuario;
             localStorage.setItem('token', datos.token);
             
             // Mostrar datos en el dashboard
@@ -203,24 +209,24 @@ window.iniciarSesion = async () => {
             // Cambiar a pantalla del juego
             mostrarJuego();
         } else {
-            alert(`❌ Error: ${datos.mensaje}`);
+            alert(`Error: ${datos.mensaje}`);
         }
     } catch (error) {
         console.error(error);
         alert('Error al conectar con el servidor');
     }
 };
-// Función global para cambiar a la pantalla del juego
+// Funcion global para cambiar a la pantalla del juego
 window.mostrarJuego = () => {
     document.querySelectorAll('.pantalla').forEach(p => p.classList.add('oculto'));
     document.getElementById('pantalla-juego').classList.remove('oculto');
 };
 //Funcion para regresar a la pantalla del juego
 window.volverAlJuego = () => {
-    // Ocultar TODAS las pantallas primero
+    // Ocultar las pantallas primero
     document.querySelectorAll('.pantalla').forEach(p => p.classList.add('oculto'));
 
-    // Asegurar que historial y ranking queden ocultos
+    // Historial y Ranking ocultos
     document.getElementById('pantalla-historial').classList.add('oculto');
     document.getElementById('pantalla-ranking').classList.add('oculto');
 
@@ -228,53 +234,84 @@ window.volverAlJuego = () => {
     document.getElementById('pantalla-juego').classList.remove('oculto');
 };
 
+// Restablecer Contra
+window.restablecerContrasena = async () => {
+    const correo = document.getElementById('correo-restablecer').value.trim();
+    const nuevaContrasena = document.getElementById('nueva-pass').value.trim();
+
+    if (!correo || !nuevaContrasena) {
+        alert('Por favor, completa ambos campos.');
+        return;
+    }
+
+    try {
+        const respuesta = await fetch('http://165.73.244.26:3000/api/auth/restablecer', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ correo, nuevaContrasena })
+        });
+
+        const datos = await respuesta.json();
+
+        if (respuesta.ok) {
+            alert('Contraseña restablecida con éxito. Ahora puedes iniciar sesión.');
+            mostrarLogin();
+        } else {
+            alert(`Error: ${datos.mensaje}`);
+        }
+    } catch (error) {
+        console.error(error);
+        alert('Error al conectar con el servidor');
+    }
+};
+
 //APOSTAR
 window.apostar = async () => {
+    if (window.contadorJugadas >= 5) {
+        alert('Has alcanzado el limite de 5 jugadas.');
+        return;
+    }
     const tipoApuesta = document.getElementById('tipo-apuesta').value;
     const valorApostado = document.getElementById('valor-apostado').value.trim().toLowerCase();
     const montoApostado = parseInt(document.getElementById('monto-apostado').value);
 
-    // ⚠️ Validar que no estén vacíos
+    // Validar datos vacios
     if (!valorApostado || isNaN(montoApostado) || montoApostado <= 0) {
-        alert('❌ Ingresa un monto válido y un valor de apuesta.');
+        alert('Ingresa un monto válido y un valor de apuesta.');
         return;
     }
 
-    // ✅ Validar el tipo de valor apostado
+    // Validar el tipo de apuesta
     if (tipoApuesta === 'color') {
         const coloresValidos = ['rojo', 'negro', 'verde'];
         if (!coloresValidos.includes(valorApostado)) {
-            alert('❌ Si apuestas al color, debes escribir: rojo, negro o verde.');
+            alert('Si apuestas al color, debes escribir: rojo, negro o verde.');
             return;
         }
     } else if (tipoApuesta === 'numero') {
         const numero = parseInt(valorApostado);
         if (isNaN(numero) || numero < 0 || numero > 36) {
-            alert('❌ Si apuestas a número, debes escribir un número entre 0 y 36.');
+            alert('Si apuestas a número, debes escribir un número entre 0 y 36.');
             return;
         }
     }
 
     if (montoApostado > window.usuarioActual.coins) {
-        alert('❌ No tienes suficientes COINS para esta apuesta.');
+        alert('No tienes suficientes COINS para esta apuesta.');
         return;
     }
 
     try {
-        // 🔒 DESACTIVAR BOTÓN antes de girar
+        // Desactiva el boton antes de girar
         document.querySelector('#ruleta-container button').disabled = true;
 
         const token = localStorage.getItem('token');
-        // Descontar visualmente las coins antes de apostar
-        const saldoActual = window.usuarioActual.coins;
-        const saldoTemporal = saldoActual - montoApostado;
-        actualizarCoins(saldoTemporal);
-
-        const respuesta = await fetch('http://localhost:3000/api/game/apostar', {
+   	
+        const respuesta = await fetch('http://165.73.244.26:3000/api/game/apostar', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}` // ✅ INCLUIR TOKEN
+                'Authorization': `Bearer ${token}`
             },
             body: JSON.stringify({
                 usuario_id: window.usuarioActual.id,
@@ -288,6 +325,10 @@ window.apostar = async () => {
         const datos = await respuesta.json();
 
         if (respuesta.ok) {
+    const saldoActual = window.usuarioActual.coins;
+    const saldoTemporal = saldoActual - montoApostado;
+    actualizarCoins(saldoTemporal);
+
             animarGiro(datos.numeroGanador, () => {
                 mostrarResultadoRuleta(
                     datos.numeroGanador,
@@ -299,14 +340,14 @@ window.apostar = async () => {
             });
         } else {
             manejarErrorTokenExpirado(datos);
-            alert(`❌ Error: ${datos.mensaje}`);
-            // 🔓 REACTIVAR BOTÓN en caso de error
+            alert(`Error: ${datos.mensaje}`);
+            // Reactivar boton en caso de error
             document.querySelector('#ruleta-container button').disabled = false;
         }
     } catch (error) {
         console.error(error);
         alert('Error al conectar con el servidor');
-        // 🔓 REACTIVAR BOTÓN si hay error de conexión
+        // Reactivar boton si hay error de conexion
         document.querySelector('#ruleta-container button').disabled = false;
     }
 };
@@ -318,7 +359,7 @@ const centerX = canvas.width / 2;
 const centerY = canvas.height / 2;
 const radio = 180;
 
-// Números de la ruleta (estilo europeo: 1–36 sin el 0)
+// NUMEROS EN RULETA
 const numeros = [0, ...Array.from({ length: 36 }, (_, i) => i + 1)];
 const colores = numeros.map(n => {
     if (n === 0) return 'green';
@@ -369,10 +410,10 @@ let animando = false;
 function animarGiro(numeroGanador, callback) {
     if (animando) return;
 
-    anguloActual = 0; // 🔄 Reinicia antes de cada giro
+    anguloActual = 0;
     animando = true;
 
-    const gradosPorNumero = 360 / 37; // con 0 incluido
+    const gradosPorNumero = 360 / 37;
     const vueltas = 5;
     const anguloObjetivo = vueltas * 360 + (numeroGanador * gradosPorNumero);
     const anguloObjetivoRad = (anguloObjetivo * Math.PI) / 180;
@@ -403,9 +444,9 @@ function girarAnimacionRuleta(numeroGanador) {
     
     const ruleta = document.getElementById('ruleta-img');
 
-    // Calculamos el ángulo exacto donde se debe detener
+    // Calcular angulo donde se deteniene la ruleta
     const gradosPorNumero = 360 / 36;
-    const anguloFinal = 3600 + (numeroGanador * gradosPorNumero); // Mínimo 10 vueltas + el número exacto
+    const anguloFinal = 3600 + (numeroGanador * gradosPorNumero); // Minimo 10 vueltas con el numero exacto
 
     ruleta.style.transition = 'transform 3s ease-out';
     ruleta.style.transform = `rotate(${anguloFinal}deg)`;
@@ -416,19 +457,18 @@ function mostrarResultadoRuleta(numero, color, mensaje, coinsGanados, nuevoSaldo
     const resultadoDiv = document.getElementById('resultado-jugada');
 
     resultadoDiv.innerHTML = `
-        <h3>🎯 Número ganador: ${numero} (${color})</h3>
+        <h3>Número ganador: ${numero} (${color})</h3>
         <p>${mensaje}</p>
-        <p>💰 Ganaste: ${coinsGanados} COINS</p>
+        <p>Ganaste: ${coinsGanados} COINS</p>
         <button id="btnAceptarResultado">Aceptar</button>
     `;
 
-    // 🔥 Agregar evento al botón para actualizar COINS y quitar el mensaje
+    // Agregar evento al botón para actualizar COINS
     document.getElementById('btnAceptarResultado').addEventListener('click', () => {
-        resultadoDiv.innerHTML = ''; // Ocultar mensaje
-        actualizarCoins(nuevoSaldo); // Actualizar el saldo de COINS
-        document.querySelector('#ruleta-container button').disabled = false; // 🔓 Reactivar botón
+        resultadoDiv.innerHTML = '';
+        actualizarCoins(nuevoSaldo);
+        document.querySelector('#ruleta-container button').disabled = false;
     });
-    
 }
 //ACTUALIZAR COINS
 function actualizarCoins(nuevoSaldo) {
@@ -439,7 +479,7 @@ function actualizarCoins(nuevoSaldo) {
 //MOSTRAR MENSAJE DE ERROR AL EXPIRAR TOKEN
 function manejarErrorTokenExpirado(error) {
     if (error?.mensaje?.toLowerCase().includes("token")) {
-        alert("🔐 Tu sesión ha expirado. Por favor, vuelve a iniciar sesión.");
+        alert("Tu sesión ha expirado. Por favor, vuelve a iniciar sesión.");
         localStorage.removeItem('token');
         window.usuarioActual = null;
         mostrarLogin();
@@ -458,5 +498,3 @@ function togglePassword(inputId, iconElement) {
         iconElement.classList.add('fa-eye');
     }
 }
-
-
