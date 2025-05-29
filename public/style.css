@@ -28,7 +28,8 @@ body {
 }
 
 #pantalla-login h2,
-#pantalla-registro h2 {
+#pantalla-registro h2,
+#pantalla-restablecer h2 {
   color: gold;
   font-weight: bold;
   font-size: 2rem;
@@ -216,3 +217,117 @@ button:hover {
   text-shadow: 0 0 5px black;
 }
 
+/* Para pantallas de 768px o menos (tablets y celulares) */
+@media (max-width: 768px) {
+    body {
+        font-size: 14px;
+        padding: 10px;
+    }
+
+    #pantalla-juego, #pantalla-login, #pantalla-registro {
+        width: 100%;
+        padding: 10px;
+    }
+
+    canvas {
+        width: 100% !important;
+        height: auto !important;
+    }
+
+    #ruleta-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    #resultado-jugada {
+        font-size: 16px;
+        text-align: center;
+    }
+
+    input, select, button {
+        width: 100%;
+        margin-bottom: 10px;
+        font-size: 16px;
+    }
+}
+canvas {
+    max-width: 100%;
+    height: auto;
+}
+/* Agrupación del input con ícono */
+.input-con-icono {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    max-width: 300px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background: white;
+    padding: 0 10px;
+    margin-bottom: 15px;
+}
+
+/* Input de tipo texto o password dentro del contenedor */
+.input-con-icono input[type="password"],
+.input-con-icono input[type="text"] {
+    flex: 1;
+    border: none;
+    outline: none;
+    font-size: 16px;
+    padding: 10px 0;
+}
+
+/* Ícono del ojito */
+.input-con-icono i {
+    cursor: pointer;
+    color: #666;
+    margin-left: 10px;
+}
+
+@media (max-width: 768px) {
+  #dashboard {
+    position: static;
+    width: 90%;
+    margin: 1rem auto;
+    text-align: center;
+  }
+
+  .modal-contenido {
+    width: 95%;
+    max-width: none;
+    height: 80vh;
+    overflow-y: auto;
+  }
+
+  input[type="password"] {
+    width: 100% !important;
+    box-sizing: border-box;
+    padding-right: 2.5rem;
+  }
+
+  .input-con-icono {
+    position: relative;
+  }
+
+  .input-con-icono i {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: gold;
+  }
+}
+a.enlace-dorado {
+  color: gold;
+  text-shadow: 0 0 5px #ffd700, 0 0 10px #ffcc00;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+a.enlace-dorado:hover {
+  color: #fff8dc;
+  text-shadow: 0 0 8px #ffff66;
+  text-decoration: underline;
+}
