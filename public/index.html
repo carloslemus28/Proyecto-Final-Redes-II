@@ -13,12 +13,11 @@
     <h1 class="titulo-principal">BIENVENIDO AL JUEGO DE LA RULETA</h1>
     <button onclick="mostrarLogin()">Iniciar</button>
   </section>
-
   <!-- Login -->
   <section id="pantalla-login" class="pantalla oculto">
     <h2>Iniciar Sesión</h2>
     <input type="email" id="login-correo" placeholder="Correo">
-    <div style="position: relative;">
+    <div class="input-con-icon" style="position: relative;">
       <input type="password" id="login-pass" placeholder="Contraseña">
       <i class="fa-solid fa-eye"
       onclick="togglePassword('login-pass', this)"
@@ -26,7 +25,8 @@
              cursor:pointer; color:#333; font-size:18px;"></i>
     </div>
     <button onclick="iniciarSesion()">Entrar</button>
-    <p>¿No tienes cuenta? <a href="#" onclick="mostrarRegistro()">Regístrate</a></p>
+    <p><a href="#" class="enlace-dorado"  onclick="mostrarRestablecer()">¿Olvidaste tu contraseña?</a></p>
+    <p>¿No tienes cuenta? <a href="#" class="enlace-dorado"  onclick="mostrarRegistro()">Regístrate</a></p>
   </section>
  <!-- Registro -->
   <section id="pantalla-registro" class="pantalla oculto">
@@ -34,18 +34,30 @@
     <input type="text" id="reg-nombre" placeholder="Nombre">
     <input type="text" id="reg-apellido" placeholder="Apellido">
     <input type="email" id="reg-correo" placeholder="Correo">
-    <div style="position: relative;">
+    <div class="input-con-icon" style="position: relative;">
       <input type="password" id="reg-pass" placeholder="Contraseña">
       <i class="fa-solid fa-eye"
       onclick="togglePassword('reg-pass', this)"
       style="position:absolute; right:10px; top:50%; transform:translateY(-50%);
              cursor:pointer; color:#333; font-size:18px;"></i>
     </div>
-       
     <button onclick="registrarUsuario()">Registrarse</button>
-    <p>¿Ya tienes cuenta? <a href="#" onclick="mostrarLogin()">Inicia sesión</a></p>
+    <p>¿Ya tienes cuenta? <a href="#" class="enlace-dorado" onclick="mostrarLogin()">Inicia sesión</a></p>
   </section>
-
+  <!-- Pantalla para reestablecer contraseña -->
+  <section id="pantalla-restablecer" class="pantalla oculto">
+    <h2>Restablecer contraseña</h2>
+    <input type="email" id="correo-restablecer" placeholder="Correo registrado">
+    <div style="position: relative;">
+    <input type="password" id="nueva-pass" placeholder="Nueva contraseña">
+    <i class="fa-solid fa-eye"
+      onclick="togglePassword('nueva-pass', this)"
+      style="position:absolute; right:10px; top:50%; transform:translateY(-50%);
+             cursor:pointer; color:#333; font-size:18px;"></i>
+    </div>
+    <button onclick="restablecerContrasena()">Reestablecer</button>
+    <button onclick="mostrarLogin()">Volver</button>
+  </section>
   <!-- Pantalla del juego -->
   <section id="pantalla-juego" class="pantalla oculto">
     <div id="dashboard">
@@ -61,13 +73,10 @@
         <button onclick="mostrarRanking()"><i class="fa-solid fa-trophy"></i> Ver Ranking</button>
       </div>
     </div>
-    
-
     <div id="ruleta-container">
         <canvas id="ruletaCanvas" width="400" height="400"></canvas>
-        <button onclick="apostar()">🎯 Girar Ruleta</button>
+        <button onclick="apostar()">Girar Ruleta</button>
     </div>    
-
     <div id="opciones-apuesta">
       <select id="tipo-apuesta">
         <option value="color">Color</option>
@@ -76,13 +85,11 @@
       <input type="text" id="valor-apostado" placeholder="rojo / 7">
       <input type="number" id="monto-apostado" placeholder="Monto (COINS)">
     </div>
-
     <div id="resultado-jugada"></div>
   </section>
-
   <!-- Ranking -->
   <section id="pantalla-ranking" class="pantalla oculto">
-    <h2>🏆 Ranking de Jugadores</h2>
+    <h2>Ranking de Jugadores</h2>
     <table id="tabla-ranking">
       <thead>
         <tr><th>#</th><th>Nombre</th><th>COINS</th></tr>
@@ -95,7 +102,7 @@
 <div id="modal-historial" class="modal oculto">
   <div class="modal-contenido">
     <span class="cerrar-modal" onclick="cerrarModalHistorial()">&times;</span>
-    <h2>📜 Historial de Apuestas</h2>
+    <h2>Historial de Apuestas</h2>
     <table id="tabla-historial">
       <thead>
         <tr>
@@ -113,8 +120,6 @@
     </table>
   </div>
 </div>
-
-  
   <script src="app.js"></script>
 </body>
 </html>
