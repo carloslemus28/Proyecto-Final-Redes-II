@@ -2,7 +2,7 @@ const express = require('express');
 const db = require('./db');
 const router = express.Router();
 const verificarToken = require('./middlewares/verificarToken');
-// Función para girar la ruleta y obtener el número ganador
+// Funcion para girar la ruleta y obtener el número ganador
 function girarRuleta() {
     const numeroGanador = Math.floor(Math.random() * 37); // 0 a 36
     
@@ -18,13 +18,13 @@ function girarRuleta() {
     return { numeroGanador, colorGanador };
 }
 
-// Ruta para girar la ruleta
+// Ruta para  ruleta
 router.get('/girar', (req, res) => {
     const resultado = girarRuleta();
     res.json(resultado);
 });
 
-// Ruta para realizar una apuesta
+// Ruta para apostar
 router.post('/apostar', verificarToken,async (req, res) => {
     const { usuario_id, tipo_apuesta, valor_apostado, monto_apostado } = req.body;
 
@@ -33,7 +33,7 @@ router.post('/apostar', verificarToken,async (req, res) => {
     }
 
     try {
-        // Verificar límite de apuestas
+        // Verificar limite de apuestas
         const [apuestasRealizadas] = await db.promise().query(
             'SELECT COUNT(*) AS total FROM historial_apuestas WHERE usuario_id = ?',
             [usuario_id]
@@ -61,7 +61,7 @@ router.post('/apostar', verificarToken,async (req, res) => {
         let resultado = 'perdido';
         let coins_ganados = 0;
 
-        // Verificar si ganó
+        // Verificar resultado
         if (tipo_apuesta === 'color' && valor_apostado === colorGanador) {
             coins_ganados = monto_apostado * (colorGanador === 'verde' ? 10 : 2);
             resultado = 'ganado';
@@ -70,7 +70,7 @@ router.post('/apostar', verificarToken,async (req, res) => {
             resultado = 'ganado';
         }
 
-        // Actualizar saldo del usuario (solución corregida)
+        // Actualizar saldo
         const nuevoSaldo = (usuario[0].coins - monto_apostado) + coins_ganados;
         await db.promise().query(
             'UPDATE usuarios SET coins = ? WHERE id = ?',
@@ -95,7 +95,7 @@ router.post('/apostar', verificarToken,async (req, res) => {
     }
 });
 
-// Ruta para obtener historial de apuestas de un usuario
+//Obtener historial de apuestas del usuario
 router.get('/historial/:usuario_id', verificarToken, async (req, res) => {
     const { usuario_id } = req.params;
 
@@ -111,7 +111,7 @@ router.get('/historial/:usuario_id', verificarToken, async (req, res) => {
     }
 });
 
-// Ruta para obtener el ranking de jugadores (top 5 por COINS)
+// Obtener el ranking
 router.get('/ranking', verificarToken, async (req, res) => {
     try {
         const [ranking] = await db.promise().query(
