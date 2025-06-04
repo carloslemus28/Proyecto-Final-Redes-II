@@ -114,10 +114,27 @@ router.get('/historial/:usuario_id', verificarToken, async (req, res) => {
 // Obtener el ranking
 router.get('/ranking', verificarToken, async (req, res) => {
     try {
+        const usuario_id = req.usuario.id;
+
+        // Obtener top 5
         const [ranking] = await db.promise().query(
             'SELECT id, nombre, apellido, coins FROM usuarios ORDER BY coins DESC LIMIT 5'
         );
-        res.json({ ranking });
+
+        // Obtener posición y datos del usuario actual
+        const [usuarioInfo] = await db.promise().query(`
+            SELECT posicion, nombre, apellido, coins FROM (
+                SELECT id, nombre, apellido, coins,
+                       ROW_NUMBER() OVER (ORDER BY coins DESC) AS posicion
+                FROM usuarios
+            ) AS sub
+            WHERE id = ?
+        `, [usuario_id]);
+
+        res.json({
+            ranking,
+            jugadorActual: usuarioInfo[0] || null
+        });
     } catch (error) {
         res.status(500).json({ mensaje: 'Error al obtener el ranking', error: error.message });
     }
