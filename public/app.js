@@ -1,5 +1,6 @@
+// Esperar a que cargue el DOM
 document.addEventListener('DOMContentLoaded', () => {
-    // SECCIONES DE PANTALLAS
+    // Secciones (coinciden con IDs del HTML)
     const inicio = document.getElementById('pantalla-inicio');
     const login = document.getElementById('pantalla-login');
     const registro = document.getElementById('pantalla-registro');
@@ -7,13 +8,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const ranking = document.getElementById('pantalla-ranking');
     const restablecer = document.getElementById('pantalla-restablecer');
 
-    // MOSTRAR TODO EN UNA PANTALLA
+    // Mostrar una sola pantalla
     function mostrar(seccion) {
         [inicio, login, registro, juego, ranking, restablecer].forEach(s => s.classList.add('oculto'));
         seccion.classList.remove('oculto');
     }
 
-    // FUNCIONES DE NAVEGACION
+    // Funciones de navegación globales para usar con "onclick" en el HTML
     window.mostrarLogin = () => {
         document.getElementById('login-correo').value = '';
         document.getElementById('login-pass').value = '';
@@ -28,7 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
         mostrar(document.getElementById('pantalla-registro'));
     };
    
- // MOSTRAR RESTABLECER CONTRA
+ // Mostrar pantalla de restablecimiento
     window.mostrarRestablecer = () => {
         document.getElementById('correo-restablecer').value = '';
         document.getElementById('nueva-pass').value = '';
@@ -44,7 +45,7 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const token = localStorage.getItem('token');
     
-            const respuesta = await fetch('http://165.73.244.26:3000/api/game/ranking', {
+            const respuesta = await fetch('https://laruletaweb.com/api/game/ranking', {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
@@ -62,6 +63,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     `;
                     tablaBody.appendChild(fila);
                 });
+	if (datos.jugadorActual) {
+    		const { posicion, nombre, apellido, coins } = datos.jugadorActual;
+    		const posicionActual = document.getElementById('posicion-actual');
+    		posicionActual.innerHTML = `
+       	 <span style="color: #FFD700; font-weight: bold;">
+             ${nombre} ${apellido}, estás en la posición #${posicion} del ranking global con ${coins} COINS.
+        </span>
+    	`;
+	}
     
                 document.querySelectorAll('.pantalla').forEach(p => p.classList.add('oculto'));
                 document.getElementById('pantalla-ranking').classList.remove('oculto');
@@ -81,7 +91,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
         try {
             const token = localStorage.getItem('token');
-            const respuesta = await fetch(`http://165.73.244.26:3000/api/game/historial/${window.usuarioActual.id}`, {
+            const respuesta = await fetch(`https://laruletaweb.com/api/game/historial/${window.usuarioActual.id}`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
@@ -122,6 +132,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     window.volverAlJuego = () => mostrar(juego);
 
+    // MOSTRAR PAGINA DE INICIO
     mostrar(inicio);
     dibujarRuleta();
 });
@@ -130,14 +141,12 @@ window.registrarUsuario = async () => {
     const nombre = document.getElementById('reg-nombre').value.trim();
     const apellido = document.getElementById('reg-apellido').value.trim();
     const correo = document.getElementById('reg-correo').value.trim();
-    // Validar formato básico del correo
+    //VALIDAR  CORREO
     const regexCorreo = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!regexCorreo.test(correo)) {
         alert('Ingresa un correo electrónico válido.');
         return;
     }
-
-    // Verificar correo
     const dominiosInvalidos = ['gamil.com', 'hotmial.com', 'yaho.com', 'gmai.com'];
     const dominioUsuario = correo.split('@')[1];
 
@@ -154,7 +163,7 @@ window.registrarUsuario = async () => {
     }
 
     try {
-        const respuesta = await fetch('http://165.73.244.26:3000/api/auth/register', {
+        const respuesta = await fetch('https://laruletaweb.com/api/auth/register', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -186,7 +195,7 @@ window.iniciarSesion = async () => {
     }
 
     try {
-        const respuesta = await fetch('http://165.73.244.26:3000/api/auth/login', {
+        const respuesta = await fetch('https://laruletaweb.com/api/auth/login', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ correo, contrasena })
@@ -197,16 +206,15 @@ window.iniciarSesion = async () => {
         if (respuesta.ok) {
             alert('Inicio de sesión exitoso');
 
-            // Guardar datos del jugador
             const usuario = datos.usuario;
             window.usuarioActual = usuario;
             localStorage.setItem('token', datos.token);
             
-            // Mostrar datos en el dashboard
+            // MOSTRAR DASHBOARD
             document.getElementById('nombre-usuario').textContent = `${usuario.nombre} ${usuario.apellido}`;
             document.getElementById('coins-usuario').textContent = usuario.coins;
 
-            // Cambiar a pantalla del juego
+            // MOSTRAR PANTALLA DEL JUEGO
             mostrarJuego();
         } else {
             alert(`Error: ${datos.mensaje}`);
@@ -216,25 +224,21 @@ window.iniciarSesion = async () => {
         alert('Error al conectar con el servidor');
     }
 };
-// Funcion global para cambiar a la pantalla del juego
+
 window.mostrarJuego = () => {
     document.querySelectorAll('.pantalla').forEach(p => p.classList.add('oculto'));
     document.getElementById('pantalla-juego').classList.remove('oculto');
 };
 //Funcion para regresar a la pantalla del juego
 window.volverAlJuego = () => {
-    // Ocultar las pantallas primero
-    document.querySelectorAll('.pantalla').forEach(p => p.classList.add('oculto'));
 
-    // Historial y Ranking ocultos
+    document.querySelectorAll('.pantalla').forEach(p => p.classList.add('oculto'));
     document.getElementById('pantalla-historial').classList.add('oculto');
     document.getElementById('pantalla-ranking').classList.add('oculto');
-
-    // Mostrar la pantalla del juego
     document.getElementById('pantalla-juego').classList.remove('oculto');
 };
 
-// Restablecer Contra
+// Restablecer contraseña
 window.restablecerContrasena = async () => {
     const correo = document.getElementById('correo-restablecer').value.trim();
     const nuevaContrasena = document.getElementById('nueva-pass').value.trim();
@@ -245,7 +249,7 @@ window.restablecerContrasena = async () => {
     }
 
     try {
-        const respuesta = await fetch('http://165.73.244.26:3000/api/auth/restablecer', {
+        const respuesta = await fetch('https://laruletaweb.com/api/auth/restablecer', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ correo, nuevaContrasena })
@@ -275,13 +279,13 @@ window.apostar = async () => {
     const valorApostado = document.getElementById('valor-apostado').value.trim().toLowerCase();
     const montoApostado = parseInt(document.getElementById('monto-apostado').value);
 
-    // Validar datos vacios
+    // ⚠️ Validar que no estén vacíos
     if (!valorApostado || isNaN(montoApostado) || montoApostado <= 0) {
         alert('Ingresa un monto válido y un valor de apuesta.');
         return;
     }
 
-    // Validar el tipo de apuesta
+    // Validar el tipo de valor apostado
     if (tipoApuesta === 'color') {
         const coloresValidos = ['rojo', 'negro', 'verde'];
         if (!coloresValidos.includes(valorApostado)) {
@@ -302,12 +306,12 @@ window.apostar = async () => {
     }
 
     try {
-        // Desactiva el boton antes de girar
+        //DESACTIVAR EL BOTON AL GIRAR RULETA
         document.querySelector('#ruleta-container button').disabled = true;
 
         const token = localStorage.getItem('token');
    	
-        const respuesta = await fetch('http://165.73.244.26:3000/api/game/apostar', {
+        const respuesta = await fetch('https://laruletaweb.com/api/game/apostar', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -341,13 +345,13 @@ window.apostar = async () => {
         } else {
             manejarErrorTokenExpirado(datos);
             alert(`Error: ${datos.mensaje}`);
-            // Reactivar boton en caso de error
+            //REACTIVAR BOTON
             document.querySelector('#ruleta-container button').disabled = false;
         }
     } catch (error) {
         console.error(error);
         alert('Error al conectar con el servidor');
-        // Reactivar boton si hay error de conexion
+        //ACTIVAR BOTON SI HAY ERROR DE CONEXION
         document.querySelector('#ruleta-container button').disabled = false;
     }
 };
@@ -359,7 +363,7 @@ const centerX = canvas.width / 2;
 const centerY = canvas.height / 2;
 const radio = 180;
 
-// NUMEROS EN RULETA
+//NUMEROS DE LA RULETA
 const numeros = [0, ...Array.from({ length: 36 }, (_, i) => i + 1)];
 const colores = numeros.map(n => {
     if (n === 0) return 'green';
@@ -377,7 +381,7 @@ function dibujarRuleta(anguloRotacion = 0) {
         const inicio = i * anguloPorSector + anguloRotacion;
         const fin = inicio + anguloPorSector;
 
-        // Color de fondo
+        // COLOR DE FONDO
         ctx.beginPath();
         ctx.moveTo(centerX, centerY);
         ctx.arc(centerX, centerY, radio, inicio, fin);
@@ -385,7 +389,7 @@ function dibujarRuleta(anguloRotacion = 0) {
         ctx.fill();
         ctx.closePath();
 
-        // Número
+        // NUMEROS
         ctx.save();
         ctx.translate(centerX, centerY);
         ctx.rotate(inicio + anguloPorSector / 2);
@@ -396,7 +400,7 @@ function dibujarRuleta(anguloRotacion = 0) {
         ctx.restore();
     }
 
-    // Círculo central
+    // CIRCULO CENTRAL
     ctx.beginPath();
     ctx.arc(centerX, centerY, 20, 0, 2 * Math.PI);
     ctx.fillStyle = "#333";
@@ -443,16 +447,14 @@ function animarGiro(numeroGanador, callback) {
 function girarAnimacionRuleta(numeroGanador) {
     
     const ruleta = document.getElementById('ruleta-img');
-
-    // Calcular angulo donde se deteniene la ruleta
     const gradosPorNumero = 360 / 36;
-    const anguloFinal = 3600 + (numeroGanador * gradosPorNumero); // Minimo 10 vueltas con el numero exacto
+    const anguloFinal = 3600 + (numeroGanador * gradosPorNumero);
 
     ruleta.style.transition = 'transform 3s ease-out';
     ruleta.style.transform = `rotate(${anguloFinal}deg)`;
 }
 
-//MOSTRAR RESULTADO DE RULETA
+//MOSTRAR RESULTADO
 function mostrarResultadoRuleta(numero, color, mensaje, coinsGanados, nuevoSaldo) {
     const resultadoDiv = document.getElementById('resultado-jugada');
 
@@ -463,12 +465,12 @@ function mostrarResultadoRuleta(numero, color, mensaje, coinsGanados, nuevoSaldo
         <button id="btnAceptarResultado">Aceptar</button>
     `;
 
-    // Agregar evento al botón para actualizar COINS
     document.getElementById('btnAceptarResultado').addEventListener('click', () => {
         resultadoDiv.innerHTML = '';
         actualizarCoins(nuevoSaldo);
         document.querySelector('#ruleta-container button').disabled = false;
     });
+    
 }
 //ACTUALIZAR COINS
 function actualizarCoins(nuevoSaldo) {
